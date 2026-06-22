@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/osrs-flip-plugin/config.schema.json",
+  "title": "OSRS Flip Plugin Configuration",
+  "description": "Schema for user configuration, watchlists, and combination recipes",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version for migration handling",
+      "examples": ["1.0.0"]
+    },
+    "general": {
+      "type": "object",
+      "properties": {
+        "profitThresholds": {
+          "type": "array",
+          "items": { "type": "integer" },
+          "description": "GP thresholds for filtering flips (e.g., [50000, 100000, 250000])",
+          "default": [50000, 100000, 250000, 500000, 1000000]
+        },
+        "autoRefresh": {
+          "type": "boolean",
+          "description": "Automatically refresh prices on a timer",
+          "default": true
+        },
+        "autoRefreshMinutes": {
+          "type": "integer",
+          "description": "Auto-refresh interval in minutes",
+          "default": 10,
+          "minimum": 1
+        },
+        "useWikiPrices": {
+          "type": "boolean",
+          "description": "Fetch real-time prices from the OSRS Wiki API",
+          "default": true
+        }
+      }
+    },
+    "watchlist": {
+      "type": "array",
+      "description": "List of item IDs to monitor",
+      "items": {
+        "type": "object",
+        "properties": {
+          "itemId": { "type": "integer" },
+          "manualBuyPrice": { 
+            "type": ["integer", "null"], 
+            "description": "User override for buy price (null = use market)"
+          },
+          "manualSellPrice": { 
+            "type": ["integer", "null"], 
+            "description": "User override for sell price (null = use market)"
+          },
+          "notes": { "type": "string" }
+        },
+        "required": ["itemId"]
+      }
+    },
+    "combinations": {
+      "type": "array",
+      "description": "User-defined combination recipes",
+      "items": {
+        "type": "object",
+        "properties": {
+          "resultItemId": { 
+            "type": "integer", 
+            "description": "Item ID of the crafted result"
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "itemId": { "type": "integer" },
+                "quantity": { "type": "integer", "minimum": 1 }
+              },
+              "required": ["itemId", "quantity"]
+            }
+          },
+          "name": { "type": "string", "description": "Custom name for this recipe" },
+          "enabled": { "type": "boolean", "default": true }
+        },
+        "required": ["resultItemId", "ingredients"]
+      }
+    }
+  },
+  "required": ["version"]
+}

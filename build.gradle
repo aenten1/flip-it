@@ -1,0 +1,60 @@
+plugins {
+id 'java'
+id 'application'
+}
+
+repositories {
+mavenLocal()
+maven {
+url = 'https://repo.runelite.net'
+content {
+includeGroupByRegex("net\\.runelite.*")
+}
+}
+mavenCentral()
+}
+
+def runeLiteVersion = 'latest.release'
+
+dependencies {
+compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
+
+compileOnly 'org.projectlombok:lombok:1.18.30'
+annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+testImplementation 'junit:junit:4.12'
+testImplementation 'org.mockito:mockito-core:3.12.4'
+testImplementation group: 'net.runelite', name:'client', version: runeLiteVersion
+testImplementation group: 'net.runelite', name:'jshell', version: runeLiteVersion
+}
+
+group = 'com.flipit'
+
+tasks.withType(JavaCompile).configureEach {
+options.encoding = 'UTF-8'
+options.release.set(11)
+}
+
+application {
+mainClass.set('net.runelite.client.RuneLite')
+applicationDefaultJvmArgs = [
+'-ea',
+'--add-opens', 'java.desktop/sun.awt=ALL-UNNAMED'
+]
+}
+
+sourceSets {
+main {
+output.resourcesDir = output.classesDirs.singleFile
+}
+}
+
+run {
+ignoreExitValue = true
+}
+
+configurations {
+runtimeOnly {
+extendsFrom compileOnly
+}
+}
