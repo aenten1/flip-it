@@ -645,7 +645,7 @@ public class OsrsFlipPanel extends PluginPanel
 						int[] cached = priceCache.get(itemId);
 						if (cached != null && cached[0] < 0 && cached[1] < 0)
 						{
-							int fallback = itemManager.getItemPrice(itemId);
+							int fallback = clampPrice(itemManager.getItemPrice(itemId));
 							if (fallback > 0)
 							{
 								priceCache.put(itemId, new int[]{fallback, fallback, fallback, fallback});
@@ -666,7 +666,7 @@ public class OsrsFlipPanel extends PluginPanel
 					volatilityCache.remove(itemId); // no series when wiki is off
 					try
 					{
-						int price = itemManager.getItemPrice(itemId);
+						int price = clampPrice(itemManager.getItemPrice(itemId));
 						priceCache.put(itemId, new int[]{price, price, price, price});
 					}
 					catch (Exception e)
@@ -678,6 +678,23 @@ public class OsrsFlipPanel extends PluginPanel
 				SwingUtilities.invokeLater(uiCallback);
 			});
 		}
+	}
+
+	/**
+	 * ItemManager#getItemPrice returns a long in current client versions. Grand Exchange prices are
+	 * capped well below Integer.MAX_VALUE, so narrowing is safe; clamp defensively regardless.
+	 */
+	private static int clampPrice(long price)
+	{
+		if (price > Integer.MAX_VALUE)
+		{
+			return Integer.MAX_VALUE;
+		}
+		if (price < Integer.MIN_VALUE)
+		{
+			return Integer.MIN_VALUE;
+		}
+		return (int) price;
 	}
 
 	private void cacheItemName(int itemId)
